@@ -9,6 +9,15 @@ namespace ShrimplyStoreWeb.Data
         {
             
         }
-        public DbSet<Category> Categories { get; set; }
+        public DbSet<Species> Species { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Species>().HasData(
+                new Species { Id = 1, Name = "Caridina", DisplayOrder = 1 },
+                new Species { Id = 2, Name = "Neocaridina", DisplayOrder = 2 },
+                new Species { Id = 3, Name = "Sulawesi", DisplayOrder = 3 }
+                );
+        }
     }
 }

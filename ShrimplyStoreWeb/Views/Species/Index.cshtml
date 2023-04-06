@@ -1,0 +1,40 @@
+﻿@model IEnumerable<Species>
+
+<div class="container">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Species List</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a class="btn btn-primary" asp-controller="Species" asp-action="Create">
+                <i class="bi bi-plus-circle-dotted"></i>&nbsp; Create
+            </a>
+        </div>
+    </div>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Species
+                </th>
+                <th>
+                    Display Order
+                </th>
+            </tr>
+        </thead>
+
+        @foreach (var species in Model)
+        {
+            <tr>
+                <td>
+                    @species.Name
+                </td>
+                <td>
+                    @species.DisplayOrder
+                </td>
+            </tr>
+        }
+    </table>
+
+</div>
+
