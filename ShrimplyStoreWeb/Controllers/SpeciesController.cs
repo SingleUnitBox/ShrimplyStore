@@ -25,11 +25,12 @@ namespace ShrimplyStoreWeb.Controllers
         [HttpPost]
         public IActionResult Create(Species species)
         {
-            ModelState.AddModelError("name", "test message");
+            //ModelState.AddModelError("name", "test message");
             if (ModelState.IsValid)
             {
                 _shrimplyStoreDbContext.Species.Add(species);
                 _shrimplyStoreDbContext.SaveChanges();
+                TempData["success"] = "Species created successfully.";
                 return RedirectToAction("Index");
             }
             return View(species);
@@ -57,6 +58,7 @@ namespace ShrimplyStoreWeb.Controllers
             {
                 _shrimplyStoreDbContext.Species.Update(species);
                 _shrimplyStoreDbContext.SaveChanges();
+                TempData["success"] = "Species edited successfully.";
                 return RedirectToAction("Index");
             }
             return View();
@@ -86,6 +88,7 @@ namespace ShrimplyStoreWeb.Controllers
             }
             _shrimplyStoreDbContext.Species.Remove(species);
             _shrimplyStoreDbContext.SaveChanges();
+            TempData["success"] = "Species deleted successfully.";
             return RedirectToAction("Index");
 
         }
