@@ -25,7 +25,7 @@ namespace ShrimplyStoreWeb.Controllers
         [HttpPost]
         public IActionResult Create(Species species)
         {
-            ModelState.AddModelError("name", "bullshit");
+            ModelState.AddModelError("name", "test message");
             if (ModelState.IsValid)
             {
                 _shrimplyStoreDbContext.Species.Add(species);
@@ -33,6 +33,61 @@ namespace ShrimplyStoreWeb.Controllers
                 return RedirectToAction("Index");
             }
             return View(species);
+        }
+
+        public IActionResult Edit(int? id)
+        {
+            if (id == 0 || id == null)
+            {
+                return NotFound();
+            }
+            var species = _shrimplyStoreDbContext.Species.FirstOrDefault(x => x.Id == id);
+            if (species == null)
+            {
+                return NotFound();
+            }
+            return View(species);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(Species species)
+        {
+
+            if (ModelState.IsValid)
+            {
+                _shrimplyStoreDbContext.Species.Update(species);
+                _shrimplyStoreDbContext.SaveChanges();
+                return RedirectToAction("Index");
+            }
+            return View();
+        }
+
+        public IActionResult Delete(int? id)
+        {
+            if (id == 0 || id == null)
+            {
+                return NotFound();
+            }
+            var species = _shrimplyStoreDbContext.Species.FirstOrDefault(x => x.Id == id);
+            if (species == null)
+            {
+                return NotFound();
+            }
+            return View(species);
+        }
+
+        [HttpPost, ActionName("Delete")]
+        public IActionResult DeletePOST(int? id)
+        {
+            var species = _shrimplyStoreDbContext.Species.Find(id);
+            if (species == null)
+            {
+                return NotFound();
+            }
+            _shrimplyStoreDbContext.Species.Remove(species);
+            _shrimplyStoreDbContext.SaveChanges();
+            return RedirectToAction("Index");
+
         }
     }
 }
