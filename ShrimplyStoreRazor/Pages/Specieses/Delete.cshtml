@@ -1,0 +1,32 @@
+﻿@page
+@model ShrimplyStoreRazor.Pages.Specieses.DeleteModel
+
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Create Species</h2>
+            <hr />
+        </div>
+        <div>
+            <input hidden asp-for="Species.Id" />
+            <div class="mb-3 row">
+                <label asp-for="Species.Name"></label>
+                <input asp-for="Species.Name" type="text" class="form-control" disabled />
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="Species.DisplayOrder"></label>
+                <input asp-for="Species.DisplayOrder" type="text" class="form-control" disabled />
+            </div>
+            <a asp-page="/Specieses/Index" class="btn btn-secondary">Back</a>          
+            <button class="btn btn-danger">Delete</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts
+    {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

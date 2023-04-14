@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace ShrimplyStoreWeb.Models
+namespace Shrimply.Models
 {
     public class Species
     {

@@ -1,5 +1,5 @@
 using Microsoft.EntityFrameworkCore;
-using ShrimplyStoreWeb.Data;
+using Shrimply.DataAccess.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 

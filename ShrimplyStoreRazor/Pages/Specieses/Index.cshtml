@@ -1,0 +1,52 @@
+﻿@page
+@model ShrimplyStoreRazor.Pages.Specieses.IndexModel
+
+
+<div class="container">
+    <div class="row pt-4">
+        <div class="col-6">
+            <h2 class="text-primary">Species List</h2>
+        </div>
+        <div class="col-6 text-end">
+            <a class="btn btn-primary" asp-page="/Specieses/Create" >
+                <i class="bi bi-plus-circle-dotted"></i>&nbsp; Create
+            </a>
+        </div>
+    </div>
+    <table class="table table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>
+                    Species
+                </th>
+                <th>
+                    Display Order
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+
+        @foreach (var species in Model.Species)
+        {
+            <tr>
+                <td>
+                    @species.Name
+                </td>
+                <td>
+                    @species.DisplayOrder
+                </td>
+                <td>
+
+                    <a asp-page="/Specieses/Edit" asp-route-id="@species.Id" class="btn btn-primary">
+                        <i class="bi bi-pencil"> &nbsp; Edit</i>
+                    </a>
+                    <a asp-page="/Specieses/Delete" asp-route-id="@species.Id" class="btn btn-danger">
+                        <i class="bi bi-trash"> &nbsp; Delete</i>
+                    </a>
+
+                </td>
+            </tr>
+        }
+    </table>
+
+</div>

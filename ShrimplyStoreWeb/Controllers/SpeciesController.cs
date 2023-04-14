@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ShrimplyStoreWeb.Data;
-using ShrimplyStoreWeb.Models;
+using Shrimply.DataAccess.Data;
+using Shrimply.Models;
 
 namespace ShrimplyStoreWeb.Controllers
 {

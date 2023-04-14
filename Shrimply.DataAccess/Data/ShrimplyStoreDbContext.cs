@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ShrimplyStoreWeb.Models;
+using Shrimply.Models;
 
-namespace ShrimplyStoreWeb.Data
+namespace Shrimply.DataAccess.Data
 {
     public class ShrimplyStoreDbContext : DbContext
     {

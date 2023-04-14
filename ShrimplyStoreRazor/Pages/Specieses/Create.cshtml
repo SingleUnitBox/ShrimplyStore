@@ -1,0 +1,31 @@
+﻿@page
+@model ShrimplyStoreRazor.Pages.Specieses.CreateModel
+
+<form method="post">
+    <div class="border p-3 mt-4">
+        <div class="row pb-2">
+            <h2 class="text-primary">Create Species</h2>
+            <hr />
+        </div>
+        <div>
+            <div class="mb-3 row">
+                <label asp-for="Species.Name"></label>
+                <input asp-for="Species.Name" type="text" class="form-control" required />
+                <span asp-validation-for="Species.Name" class="text-danger"></span>
+            </div>
+            <div class="mb-3 row">
+                <label asp-for="Species.DisplayOrder"></label>
+                <input asp-for="Species.DisplayOrder" type="text" class="form-control" required />
+                <span asp-validation-for="Species.DisplayOrder" class="text-danger"></span>
+            </div>
+            <a asp-page="/Specieses/Index" class="btn btn-secondary">Back</a>
+            <button class="btn btn-primary">Create</button>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

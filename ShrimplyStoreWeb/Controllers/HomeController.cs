@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using ShrimplyStoreWeb.Models;
+using Shrimply.Models;
 using System.Diagnostics;
 
 namespace ShrimplyStoreWeb.Controllers

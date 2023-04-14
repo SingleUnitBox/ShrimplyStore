@@ -1,4 +1,4 @@
-namespace ShrimplyStoreWeb.Models
+namespace Shrimply.Models
 {
     public class ErrorViewModel
     {

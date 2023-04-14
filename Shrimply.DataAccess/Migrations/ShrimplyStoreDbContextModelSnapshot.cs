@@ -3,11 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using ShrimplyStoreWeb.Data;
+using Shrimply.DataAccess.Data;
 
 #nullable disable
 
-namespace ShrimplyStoreWeb.Migrations
+namespace Shrimply.DataAccess.Migrations
 {
     [DbContext(typeof(ShrimplyStoreDbContext))]
     partial class ShrimplyStoreDbContextModelSnapshot : ModelSnapshot

@@ -4,7 +4,7 @@
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace ShrimplyStoreWeb.Migrations
+namespace Shrimply.DataAccess.Migrations
 {
     /// <inheritdoc />
     public partial class Species : Migration
