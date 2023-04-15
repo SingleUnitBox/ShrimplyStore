@@ -1,20 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shrimply.DataAccess.Data;
+using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
 
 namespace ShrimplyStoreWeb.Controllers
 {
     public class SpeciesController : Controller
     {
-        private readonly ShrimplyStoreDbContext _shrimplyStoreDbContext;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public SpeciesController(ShrimplyStoreDbContext shrimplyStoreDbContext)
+        public SpeciesController(IUnitOfWork unitOfWork)
         {
-            _shrimplyStoreDbContext = shrimplyStoreDbContext;
+            _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
-        {
-            var speciesList = _shrimplyStoreDbContext.Species.ToList();
+        {            
+            var speciesList = _unitOfWork.Species.GetAll().ToList();
             return View(speciesList);
         }
 
@@ -28,8 +29,8 @@ namespace ShrimplyStoreWeb.Controllers
             //ModelState.AddModelError("name", "test message");
             if (ModelState.IsValid)
             {
-                _shrimplyStoreDbContext.Species.Add(species);
-                _shrimplyStoreDbContext.SaveChanges();
+                _unitOfWork.Species.Add(species);
+                _unitOfWork.Save();
                 TempData["success"] = "Species created successfully.";
                 return RedirectToAction("Index");
             }
@@ -42,7 +43,7 @@ namespace ShrimplyStoreWeb.Controllers
             {
                 return NotFound();
             }
-            var species = _shrimplyStoreDbContext.Species.FirstOrDefault(x => x.Id == id);
+            var species = _unitOfWork.Species.Get(u => u.Id == id);
             if (species == null)
             {
                 return NotFound();
@@ -56,8 +57,8 @@ namespace ShrimplyStoreWeb.Controllers
 
             if (ModelState.IsValid)
             {
-                _shrimplyStoreDbContext.Species.Update(species);
-                _shrimplyStoreDbContext.SaveChanges();
+                _unitOfWork.Species.Update(species);
+                _unitOfWork.Save();
                 TempData["success"] = "Species edited successfully.";
                 return RedirectToAction("Index");
             }
@@ -70,7 +71,7 @@ namespace ShrimplyStoreWeb.Controllers
             {
                 return NotFound();
             }
-            var species = _shrimplyStoreDbContext.Species.FirstOrDefault(x => x.Id == id);
+            var species = _unitOfWork.Species.Get(x => x.Id == id);
             if (species == null)
             {
                 return NotFound();
@@ -81,13 +82,13 @@ namespace ShrimplyStoreWeb.Controllers
         [HttpPost, ActionName("Delete")]
         public IActionResult DeletePOST(int? id)
         {
-            var species = _shrimplyStoreDbContext.Species.Find(id);
+            var species = _unitOfWork.Species.Get(x => x.Id == id);
             if (species == null)
             {
                 return NotFound();
             }
-            _shrimplyStoreDbContext.Species.Remove(species);
-            _shrimplyStoreDbContext.SaveChanges();
+            _unitOfWork.Species.Remove(species);
+            _unitOfWork.Save();
             TempData["success"] = "Species deleted successfully.";
             return RedirectToAction("Index");
 
