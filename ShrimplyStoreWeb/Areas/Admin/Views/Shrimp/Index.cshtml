@@ -1,0 +1,82 @@
+﻿@model IEnumerable<Shrimp>
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="py-2">
+                    Shrimp List
+                </h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="row pt-4">
+            <div class="col-6">
+            </div>
+            <div class="col-6 text-end">
+                <a class="btn btn-primary" asp-controller="Shrimp" asp-action="Create">
+                    <i class="bi bi-plus-circle-dotted"></i>&nbsp; Create
+                </a>
+            </div>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>
+                        Name
+                    </th>
+                    <th>
+                        Description
+                    </th>
+                    <th>
+                        Owner
+                    </th>
+                    <th>
+                        Price
+                    </th>
+                    <th>
+                        Bar Code
+                    </th>
+                    <th>
+                        Species
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+
+            @foreach (var shrimp in Model)
+            {
+                <tr>
+                    <td>
+                        @shrimp.Name
+                    </td>
+                    <td>
+                        @shrimp.Description
+                    </td>
+                    <td>
+                        @shrimp.Owner
+                    </td>
+                    <td>
+                        @shrimp.Price
+                    </td>
+                    <td>
+                        @shrimp.BarCode
+                    </td>
+                    <td></td>
+                    <td>
+
+                        <a asp-action="Edit" asp-route-id="@shrimp.Id" class="btn btn-primary">
+                            <i class="bi bi-pencil"> &nbsp; Edit</i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@shrimp.Id" class="btn btn-danger">
+                            <i class="bi bi-trash"> &nbsp; Delete</i>
+                        </a>
+
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+

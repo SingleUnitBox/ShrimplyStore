@@ -3,8 +3,9 @@ using Shrimply.DataAccess.Data;
 using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
 
-namespace ShrimplyStoreWeb.Controllers
+namespace ShrimplyStoreWeb.Areas.Admin.Controllers
 {
+    [Area("Admin")]
     public class SpeciesController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -14,13 +15,13 @@ namespace ShrimplyStoreWeb.Controllers
             _unitOfWork = unitOfWork;
         }
         public IActionResult Index()
-        {            
+        {
             var speciesList = _unitOfWork.Species.GetAll().ToList();
             return View(speciesList);
         }
 
         public IActionResult Create()
-        { 
+        {
             return View();
         }
         [HttpPost]
