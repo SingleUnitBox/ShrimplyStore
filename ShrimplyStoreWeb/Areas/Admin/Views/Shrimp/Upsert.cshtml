@@ -1,0 +1,118 @@
+﻿@model ShrimpViewModel
+
+<div class="card shadow border-0 mt-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                @if (Model.Shrimp.Id == null || Model.Shrimp.Id == 0)
+                {
+                    <h2 class="py-2">
+                        Create Shrimp
+                    </h2>
+                }
+                else
+                {
+                    <h2 class="py-2">
+                        Edit Shrimp
+                    </h2>
+                }
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="post" class="row" enctype="multipart/form-data">
+            <div class="row">
+                <div class="col-10">
+                    <div class="border p-3">
+                        <div>
+                            <input hidden asp-for="Shrimp.Id" />
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="Shrimp.Name" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Shrimp.Name" class="ms-2"></label>
+                                <span asp-validation-for="Shrimp.Name" class="text-danger"></span>
+                            </div>
+                            <div class="py-2 col-12">
+                                <label asp-for="Shrimp.Description" class="ms-2 text-muted"></label>
+                                <textarea asp-for="Shrimp.Description" class="form-control border-0 shadow"></textarea>
+                            </div>
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="Shrimp.BarCode" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Shrimp.BarCode" class="ms-2"></label>
+                                <span asp-validation-for="Shrimp.BarCode" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="Shrimp.Owner" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Shrimp.Owner" class="ms-2"></label>
+                                <span asp-validation-for="Shrimp.Owner" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="Shrimp.ListPrice" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Shrimp.ListPrice" class="ms-2"></label>
+                                <span asp-validation-for="Shrimp.ListPrice" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="Shrimp.Price" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Shrimp.Price" class="ms-2"></label>
+                                <span asp-validation-for="Shrimp.Price" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="Shrimp.Price50" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Shrimp.Price50" class="ms-2"></label>
+                                <span asp-validation-for="Shrimp.Price50" class="text-danger"></span>
+                            </div>
+                            <div class="form-floating py-2 col-12">
+                                <input asp-for="Shrimp.Price100" type="text" class="form-control border-0 shadow" />
+                                <label asp-for="Shrimp.Price100" class="ms-2"></label>
+                                <span asp-validation-for="Shrimp.Price100" class="text-danger"></span>
+                            </div>
+                            @*                    <div class="form-floating py-2 col-12">
+                            <input asp-for="Shrimp.ImageUrl" type="text" class="form-control border-0 shadow" />
+                            <label asp-for="Shrimp.ImageUrl" class="ms-2"></label>
+                            <span asp-validation-for="Shrimp.ImageUrl" class="text-danger"></span>
+                            </div>*@
+                            <div class="form-floating py-2 col-12">
+                                <input type="file" name="file" class="form-control border-0 shadow" />
+                                <label asp-for="Shrimp.ImageUrl" class="ms-2"></label>
+                            </div>
+                            <div class="form-floating py-2 col-12">
+                                <select asp-for="Shrimp.SpeciesId" asp-items="@Model.SpeciesList" class="form-select border-0 shadow">
+                                    <option disabled selected>-- Select Species --</option>
+                                </select>
+                                <label asp-for="Shrimp.SpeciesId" class="ms-2"></label>
+                                <span asp-validation-for="Shrimp.SpeciesId" class="text-danger"></span>
+                            </div>
+                            <a asp-action="Index" class="btn btn-outline-primary">Back</a>
+                            @if (Model.Shrimp.Id == null || Model.Shrimp.Id == 0)
+                            {
+                                <button class="btn btn-primary">Create</button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-primary">Edit</button>
+                            }
+                        </div>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <img src="@Model.Shrimp.ImageUrl" width="100%"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+@section Scripts
+    {
+    <script>
+        tinymce.init({
+            selector: 'textarea',
+            plugins: 'anchor autolink charmap codesample emoticons  lists media  table visualblocks wordcount',
+            toolbar: 'undo redo | blocks fontfamily fontsize | bold italic underline strikethrough | align lineheight | numlist bullist indent outdent',
+        });
+    </script>
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

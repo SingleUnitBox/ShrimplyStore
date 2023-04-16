@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Shrimply.DataAccess.Data;
 
@@ -10,9 +11,11 @@ using Shrimply.DataAccess.Data;
 namespace Shrimply.DataAccess.Migrations
 {
     [DbContext(typeof(ShrimplyStoreDbContext))]
-    partial class ShrimplyStoreDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230415170348_addImageUrl")]
+    partial class addImageUrl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

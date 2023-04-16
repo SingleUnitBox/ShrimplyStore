@@ -11,8 +11,8 @@ using Shrimply.DataAccess.Data;
 namespace Shrimply.DataAccess.Migrations
 {
     [DbContext(typeof(ShrimplyStoreDbContext))]
-    [Migration("20230415145522_Shrimp")]
-    partial class Shrimp
+    [Migration("20230415164830_addForeignKeyForShrimpSpecies")]
+    partial class addForeignKeyForShrimpSpecies
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -60,7 +60,12 @@ namespace Shrimply.DataAccess.Migrations
                     b.Property<double>("Price50")
                         .HasColumnType("float");
 
+                    b.Property<int>("SpeciesId")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("SpeciesId");
 
                     b.ToTable("Shrimps");
 
@@ -70,36 +75,39 @@ namespace Shrimply.DataAccess.Migrations
                             Id = 1,
                             BarCode = "12345",
                             Description = "PRL",
-                            ListPrice = 0.0,
+                            ListPrice = 10.0,
                             Name = "Pure Red Line",
                             Owner = "Cez",
-                            Price = 0.0,
-                            Price100 = 0.0,
-                            Price50 = 0.0
+                            Price = 5.0,
+                            Price100 = 3.0,
+                            Price50 = 4.0,
+                            SpeciesId = 1
                         },
                         new
                         {
                             Id = 2,
                             BarCode = "12345",
                             Description = "PBL",
-                            ListPrice = 0.0,
+                            ListPrice = 16.0,
                             Name = "Pure Black Line",
                             Owner = "Zuk",
-                            Price = 0.0,
-                            Price100 = 0.0,
-                            Price50 = 0.0
+                            Price = 12.0,
+                            Price100 = 8.0,
+                            Price50 = 10.0,
+                            SpeciesId = 1
                         },
                         new
                         {
                             Id = 3,
                             BarCode = "12345",
                             Description = "PWL",
-                            ListPrice = 0.0,
+                            ListPrice = 10.0,
                             Name = "Pure White Line",
                             Owner = "Zek",
-                            Price = 0.0,
-                            Price100 = 0.0,
-                            Price50 = 0.0
+                            Price = 5.0,
+                            Price100 = 3.0,
+                            Price50 = 4.0,
+                            SpeciesId = 2
                         });
                 });
 
@@ -142,6 +150,17 @@ namespace Shrimply.DataAccess.Migrations
                             DisplayOrder = 3,
                             Name = "Sulawesi"
                         });
+                });
+
+            modelBuilder.Entity("Shrimply.Models.Shrimp", b =>
+                {
+                    b.HasOne("Shrimply.Models.Species", "Species")
+                        .WithMany()
+                        .HasForeignKey("SpeciesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Species");
                 });
 #pragma warning restore 612, 618
         }

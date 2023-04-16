@@ -1,4 +1,4 @@
-﻿@model Shrimp
+﻿@model ShrimpViewModel
 
 <div class="card shadow border-0 mt-4">
     <div class="card-header bg-secondary bg-gradient ml-0 py-3">
@@ -11,48 +11,59 @@
         </div>
     </div>
     <div class="card-body p-4">
-        <form method="post" class="row">
+        <form method="post" class="row" enctype="multipart/form-data">
             <div class="border p-3">
                 <div>
                     <div class="form-floating py-2 col-12">
-                        <input asp-for="Name" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="Name" class="ms-2"></label>
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <input asp-for="Shrimp.Name" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.Name" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.Name" class="text-danger"></span>
                     </div>
                     <div class="form-floating py-2 col-12">
-                        <input asp-for="Description" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="Description" class="ms-2"></label>
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <input asp-for="Shrimp.Description" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.Description" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.Description" class="text-danger"></span>
                     </div>
                     <div class="form-floating py-2 col-12">
-                        <input asp-for="BarCode" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="BarCode" class="ms-2"></label>
-                        <span asp-validation-for="BarCode" class="text-danger"></span>
+                        <input asp-for="Shrimp.BarCode" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.BarCode" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.BarCode" class="text-danger"></span>
                     </div>
                     <div class="form-floating py-2 col-12">
-                        <input asp-for="Owner" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="Owner" class="ms-2"></label>
-                        <span asp-validation-for="Owner" class="text-danger"></span>
+                        <input asp-for="Shrimp.Owner" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.Owner" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.Owner" class="text-danger"></span>
                     </div>
                     <div class="form-floating py-2 col-12">
-                        <input asp-for="ListPrice" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="ListPrice" class="ms-2"></label>
-                        <span asp-validation-for="ListPrice" class="text-danger"></span>
+                        <input asp-for="Shrimp.ListPrice" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.ListPrice" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.ListPrice" class="text-danger"></span>
                     </div>
                     <div class="form-floating py-2 col-12">
-                        <input asp-for="Price" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="Price" class="ms-2"></label>
-                        <span asp-validation-for="Price" class="text-danger"></span>
+                        <input asp-for="Shrimp.Price" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.Price" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.Price" class="text-danger"></span>
                     </div>
                     <div class="form-floating py-2 col-12">
-                        <input asp-for="Price50" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="Price50" class="ms-2"></label>
-                        <span asp-validation-for="Price50" class="text-danger"></span>
+                        <input asp-for="Shrimp.Price50" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.Price50" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.Price50" class="text-danger"></span>
                     </div>
                     <div class="form-floating py-2 col-12">
-                        <input asp-for="Price100" type="text" class="form-control border-0 shadow" />
-                        <label asp-for="Price100" class="ms-2"></label>
-                        <span asp-validation-for="Price100" class="text-danger"></span>
+                        <input asp-for="Shrimp.Price100" type="text" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.Price100" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.Price100" class="text-danger"></span>
+                    </div>
+                    <div class="form-floating py-2 col-12">
+                        <input type="file" class="form-control border-0 shadow" />
+                        <label asp-for="Shrimp.ImageUrl" class="ms-2"></label>
+                    </div>
+                    <div class="form-floating py-2 col-12">
+                        <select asp-for="Shrimp.SpeciesId" asp-items="@Model.SpeciesList" class="form-select border-0 shadow">
+                            <option disabled selected>-- Select Species --</option>
+                        </select>
+                        <label asp-for="Shrimp.SpeciesId" class="ms-2"></label>
+                        <span asp-validation-for="Shrimp.SpeciesId" class="text-danger"></span>
                     </div>
                     <a asp-action="Index" class="btn btn-outline-primary">Back</a>
                     <button class="btn btn-primary">Create</button>
