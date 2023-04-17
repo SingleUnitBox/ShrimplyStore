@@ -20,63 +20,23 @@
                 </a>
             </div>
         </div>
-        <table class="table table-bordered table-striped">
+        <table id="tblData" class="table table-bordered table-striped" style="width:100%">
             <thead>
                 <tr>
-                    <th>
-                        Name
-                    </th>
-                    <th>
-                        Description
-                    </th>
-                    <th>
-                        Owner
-                    </th>
-                    <th>
-                        Price
-                    </th>
-                    <th>
-                        Bar Code
-                    </th>
-                    <th>
-                        Species
-                    </th>
+                    <th>Name</th>
+                    <th>Owner</th>
+                    <th>Price</th>
+                    <th>Bar Code</th>
+                    <th>Species</th>
                     <th></th>
                 </tr>
             </thead>
-
-            @foreach (var shrimp in Model)
-            {
-                <tr>
-                    <td>
-                        @shrimp.Name
-                    </td>
-                    <td>
-                        @shrimp.Description
-                    </td>
-                    <td>
-                        @shrimp.Owner
-                    </td>
-                    <td>
-                        @shrimp.Price
-                    </td>
-                    <td>
-                        @shrimp.BarCode
-                    </td>
-                    <td></td>
-                    <td>
-
-                        <a asp-action="Upsert" asp-route-id="@shrimp.Id" class="btn btn-primary">
-                            <i class="bi bi-pencil"> &nbsp; Edit</i>
-                        </a>
-                        <a asp-action="Delete" asp-route-id="@shrimp.Id" class="btn btn-danger">
-                            <i class="bi bi-trash"> &nbsp; Delete</i>
-                        </a>
-
-                    </td>
-                </tr>
-            }
         </table>
     </div>
 </div>
+
+@section Scripts
+{
+    <script src="~/js/shrimp.js"></script>
+}
 

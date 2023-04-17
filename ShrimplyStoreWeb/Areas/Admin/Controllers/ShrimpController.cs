@@ -22,7 +22,7 @@ namespace ShrimplyStoreWeb.Areas.Admin.Controllers
 
         public IActionResult Index()
         {
-            var shrimps = _unitOfWork.Shrimps.GetAll().ToList();
+            var shrimps = _unitOfWork.Shrimps.GetAll(includeProperties: "Species").ToList();
 
             return View(shrimps);
         }
@@ -96,26 +96,33 @@ namespace ShrimplyStoreWeb.Areas.Admin.Controllers
             return View(shrimpViewModel);
         }
 
-        public IActionResult Delete(int? id)
+        #region API CALLS
+        [HttpGet]
+        public IActionResult GetAll() 
         {
-            if (id == null || id == 0)
-            {
-                return NotFound();
-            }
-            var shrimp = _unitOfWork.Shrimps.Get(x => x.Id == id);
-            if (shrimp == null)
-            {
-                return NotFound();
-            }
-            return View(shrimp);
+            var shrimps = _unitOfWork.Shrimps.GetAll(includeProperties: "Species").ToList();
+            return Json(new { data = shrimps });
         }
-        [HttpPost]
-        public IActionResult Delete(Shrimp shrimp)
+        [HttpDelete]
+        public IActionResult Delete(int? id) 
         {
-            _unitOfWork.Shrimps.Remove(shrimp);
+            var shrimpToBeDeleted = _unitOfWork.Shrimps.Get(u => u.Id == id);
+            if (shrimpToBeDeleted == null)
+            {
+                return Json(new { success = false, message = "Error while deleting" });
+            }
+
+            string wwwRootPath = _webHostEnvironment.WebRootPath;
+            var oldImagePath = Path.Combine(wwwRootPath, shrimpToBeDeleted.ImageUrl.TrimStart('\\'));
+            if (System.IO.File.Exists(oldImagePath))
+            {
+                System.IO.File.Delete(oldImagePath);
+            }
+
+            _unitOfWork.Shrimps.Remove(shrimpToBeDeleted);
             _unitOfWork.Save();
-            TempData["error"] = "Shrimp deleted successfully.";
-            return RedirectToAction("Index");
+            return Json(new { success = true, message = "Delete successful" });
         }
+        #endregion
     }
 }
