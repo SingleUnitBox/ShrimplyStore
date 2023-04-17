@@ -1,9 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using Shrimply.Models;
 
 namespace Shrimply.DataAccess.Data
 {
-    public class ShrimplyStoreDbContext : DbContext
+    public class ShrimplyStoreDbContext : IdentityDbContext
     {
         public ShrimplyStoreDbContext(DbContextOptions<ShrimplyStoreDbContext> options) :base(options)
         {
@@ -11,9 +12,12 @@ namespace Shrimply.DataAccess.Data
         }
         public DbSet<Species> Species { get; set; }
         public DbSet<Shrimp> Shrimps { get; set; }
+        public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             modelBuilder.Entity<Species>().HasData(
                 new Species { Id = 1, Name = "Caridina", DisplayOrder = 1 },
                 new Species { Id = 2, Name = "Neocaridina", DisplayOrder = 2 },
