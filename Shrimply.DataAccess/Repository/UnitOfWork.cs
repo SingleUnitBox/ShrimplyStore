@@ -13,12 +13,15 @@ namespace Shrimply.DataAccess.Repository
         private readonly ShrimplyStoreDbContext _shrimplyStoreDbContext;
         public ISpeciesRepository Species { get; private set; }
         public IShrimpRepository Shrimps { get; private set; }
+        public ICompanyRepository Companies { get; private set; }
 
         public UnitOfWork(ShrimplyStoreDbContext shrimplyStoreDbContext)
         {
             _shrimplyStoreDbContext = shrimplyStoreDbContext;
             Species = new SpeciesRepository(_shrimplyStoreDbContext);
             Shrimps = new ShrimpRepository(_shrimplyStoreDbContext);
+            Companies = new CompanyRepository(_shrimplyStoreDbContext);
+
         }
         
         public void Save()

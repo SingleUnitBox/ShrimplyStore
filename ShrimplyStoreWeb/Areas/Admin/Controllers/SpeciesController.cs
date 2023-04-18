@@ -1,11 +1,15 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shrimply.DataAccess.Data;
 using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
+using Shrimply.Utility;
+using System.Data;
 
 namespace ShrimplyStoreWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class SpeciesController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;

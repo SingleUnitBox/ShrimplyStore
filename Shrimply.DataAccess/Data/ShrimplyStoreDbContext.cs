@@ -13,6 +13,7 @@ namespace Shrimply.DataAccess.Data
         public DbSet<Species> Species { get; set; }
         public DbSet<Shrimp> Shrimps { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Company> Companies { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

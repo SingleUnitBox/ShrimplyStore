@@ -10,6 +10,7 @@ namespace Shrimply.DataAccess.Repository.IRepository
     {
         ISpeciesRepository Species { get; }
         IShrimpRepository Shrimps { get; }
+        ICompanyRepository Companies { get; }
         void Save();
     }
 }

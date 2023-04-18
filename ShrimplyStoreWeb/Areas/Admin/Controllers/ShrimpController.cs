@@ -1,13 +1,16 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
 using Shrimply.Models.ViewModels;
+using Shrimply.Utility;
 
 namespace ShrimplyStoreWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize(Roles = SD.Role_Admin)]
     public class ShrimpController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
