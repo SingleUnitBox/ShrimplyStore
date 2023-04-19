@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shrimply.Models;
+using System.Runtime.InteropServices;
 
 namespace Shrimply.DataAccess.Data
 {
@@ -31,6 +32,14 @@ namespace Shrimply.DataAccess.Data
                             ListPrice = 16, Price = 12, Price50 = 10, Price100 = 8, ImageUrl = "" },
                 new Shrimp { Id = 3, Name = "Pure White Line", Description = "PWL", BarCode = "12345", Owner = "Zek", SpeciesId = 2, 
                             ListPrice = 10, Price = 5, Price50 = 4, Price100 = 3, ImageUrl = "" }
+                );
+            modelBuilder.Entity<Company>().HasData(
+                new Company { Id = 1, Name = "Comapny1", StreetAddress = "Main St", City = "Big City", State = "Stateless",
+                                PostalCode = "123", PhoneNumber = "1245" },
+                new Company { Id = 2, Name = "Comapny2", StreetAddress = "Main St", City = "Big City", State = "Stateless",
+                                PostalCode = "123", PhoneNumber = "1245" },
+                new Company { Id = 3, Name = "Comapny3", StreetAddress = "Main St", City = "Big City", State = "Stateless",
+                                PostalCode = "123", PhoneNumber = "1245" }
                 );
         }
     }
