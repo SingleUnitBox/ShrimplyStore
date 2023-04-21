@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
+using Shrimply.Models.ViewModels;
 using System.Diagnostics;
 
 namespace ShrimplyStoreWeb.Areas.Customer.Controllers
@@ -24,8 +25,11 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
         }
         public IActionResult Details(int shrimpId)
         {
-            var shrimp = _unitOfWork.Shrimps.Get(x => x.Id == shrimpId, includeProperties: "Species");
-            return View(shrimp);
+            ShoppingCart shoppingCart = new ShoppingCart
+            {
+                Shrimp = _unitOfWork.Shrimps.Get(x => x.Id == shrimpId, includeProperties: "Species")
+            };
+            return View(shoppingCart);
         }
 
         public IActionResult Privacy()

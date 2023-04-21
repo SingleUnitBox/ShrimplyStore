@@ -11,6 +11,8 @@ namespace Shrimply.DataAccess.Repository.IRepository
         ISpeciesRepository Species { get; }
         IShrimpRepository Shrimps { get; }
         ICompanyRepository Companies { get; }
+        IShoppingCartRepository ShoppingCarts { get; }
+        IApplicationUserRepository ApplicationUsers { get; }
         void Save();
     }
 }

@@ -14,6 +14,8 @@ namespace Shrimply.DataAccess.Repository
         public ISpeciesRepository Species { get; private set; }
         public IShrimpRepository Shrimps { get; private set; }
         public ICompanyRepository Companies { get; private set; }
+        public IShoppingCartRepository ShoppingCarts { get; private set; }
+        public IApplicationUserRepository ApplicationUsers { get; private set; }
 
         public UnitOfWork(ShrimplyStoreDbContext shrimplyStoreDbContext)
         {
@@ -21,7 +23,8 @@ namespace Shrimply.DataAccess.Repository
             Species = new SpeciesRepository(_shrimplyStoreDbContext);
             Shrimps = new ShrimpRepository(_shrimplyStoreDbContext);
             Companies = new CompanyRepository(_shrimplyStoreDbContext);
-
+            ShoppingCarts = new ShoppingCartRepository(_shrimplyStoreDbContext);
+            ApplicationUsers = new ApplicationUserRepository(_shrimplyStoreDbContext);
         }
         
         public void Save()

@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shrimply.Models;
+using Shrimply.Models.ViewModels;
 using System.Runtime.InteropServices;
 
 namespace Shrimply.DataAccess.Data
@@ -15,6 +16,7 @@ namespace Shrimply.DataAccess.Data
         public DbSet<Shrimp> Shrimps { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
         public DbSet<Company> Companies { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
