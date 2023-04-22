@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
 using Shrimply.Models.ViewModels;
+using Shrimply.Utility;
 using System.Security.Claims;
 
 namespace ShrimplyStoreWeb.Areas.Customer.Controllers
@@ -78,7 +79,52 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
 
             ShoppingCartViewModel.ShoppingCartsList = _unitOfWork.ShoppingCarts.GetAll(x => x.ApplicationUserId == userId,
                 includeProperties: "Shrimp");
-            
+
+            ShoppingCartViewModel.OrderHeader.OrderDate = DateTime.Now;
+            ShoppingCartViewModel.OrderHeader.ApplicationUserId = userId;
+            ApplicationUser appUser = _unitOfWork.ApplicationUsers.Get(u => u.Id == userId);
+
+            foreach (var shrimp in ShoppingCartViewModel.ShoppingCartsList)
+            {
+                shrimp.Price = GetPriceBasedOnQuantity(shrimp);
+                ShoppingCartViewModel.OrderHeader.OrderTotal += shrimp.Price * shrimp.Count;
+            }
+
+            if (appUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                ShoppingCartViewModel.OrderHeader.OrderStatus = SD.StatusPending;
+                ShoppingCartViewModel.OrderHeader.PaymentStatus = SD.PaymentStatusPending;
+            }
+            else
+            {
+                ShoppingCartViewModel.OrderHeader.OrderStatus = SD.StatusApproved;
+                ShoppingCartViewModel.OrderHeader.PaymentStatus = SD.PaymentStatusDelayedPayment;
+            }
+            _unitOfWork.OrderHeaders.Add(ShoppingCartViewModel.OrderHeader);
+            _unitOfWork.Save();
+
+            foreach (var shrimp in ShoppingCartViewModel.ShoppingCartsList)
+            {
+                OrderDetail orderDetail = new()
+                {
+                    ShrimpId = shrimp.ShrimpId,
+                    OrderHeaderId = ShoppingCartViewModel.OrderHeader.Id,
+                    Price = shrimp.Price,
+                    Count = shrimp.Count,
+                };
+                _unitOfWork.OrderDetails.Add(orderDetail);
+                _unitOfWork.Save();
+            }
+
+            if (appUser.CompanyId.GetValueOrDefault() == 0)
+            {
+                //stripe logic
+            }
+            return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartViewModel.OrderHeader.Id });
+        }
+        public IActionResult OrderConfirmation(int id)
+        {
+            return View(id);
         }
         public IActionResult Plus(int cartId)
         {
