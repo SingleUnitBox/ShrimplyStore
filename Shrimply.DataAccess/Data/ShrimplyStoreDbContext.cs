@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Shrimply.Models;
-using Shrimply.Models.ViewModels;
 using System.Runtime.InteropServices;
 
 namespace Shrimply.DataAccess.Data

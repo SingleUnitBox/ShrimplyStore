@@ -1,6 +1,6 @@
 ﻿using Shrimply.DataAccess.Data;
-using Shrimply.DataAccess.Migrations;
 using Shrimply.DataAccess.Repository.IRepository;
+using Shrimply.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;

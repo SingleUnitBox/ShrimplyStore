@@ -8,7 +8,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Shrimply.Models.ViewModels
+namespace Shrimply.Models
 {
     public class ShoppingCart
     {
@@ -24,5 +24,7 @@ namespace Shrimply.Models.ViewModels
         [ForeignKey("ApplicationUserId")]
         [ValidateNever]
         public ApplicationUser ApplicationUser { get; set; }
+        [NotMapped]
+        public double Price { get; set; }
     }
 }

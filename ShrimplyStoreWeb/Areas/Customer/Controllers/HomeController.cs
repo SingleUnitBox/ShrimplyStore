@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
-using Shrimply.Models.ViewModels;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace ShrimplyStoreWeb.Areas.Customer.Controllers
 {
@@ -27,9 +28,35 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
         {
             ShoppingCart shoppingCart = new ShoppingCart
             {
-                Shrimp = _unitOfWork.Shrimps.Get(x => x.Id == shrimpId, includeProperties: "Species")
+                Shrimp = _unitOfWork.Shrimps.Get(x => x.Id == shrimpId, includeProperties: "Species"),
+                Count = 1,
+                ShrimpId = shrimpId
             };
             return View(shoppingCart);
+        }
+        [HttpPost]
+        [Authorize]
+        public IActionResult Details(ShoppingCart shoppingCart)
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            shoppingCart.ApplicationUserId = userId;
+
+            var cartFromDb = _unitOfWork.ShoppingCarts.Get(x => x.ApplicationUserId == userId &&
+            x.ShrimpId == shoppingCart.ShrimpId);
+            if (cartFromDb != null)
+            {
+                cartFromDb.Count += shoppingCart.Count;
+                _unitOfWork.ShoppingCarts.Update(cartFromDb);
+            }
+            else
+            {
+                _unitOfWork.ShoppingCarts.Add(shoppingCart);
+            }            
+            _unitOfWork.Save();
+            TempData["success"] = "Cart updated successfully.";
+
+            return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Privacy()
@@ -42,5 +69,6 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
     }
 }
