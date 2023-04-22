@@ -12,6 +12,7 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
     public class ShoppingCartController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        [BindProperty]
         public ShoppingCartViewModel ShoppingCartViewModel { get; set; }
 
         public ShoppingCartController(IUnitOfWork unitOfWork)
@@ -26,13 +27,14 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
             ShoppingCartViewModel = new ShoppingCartViewModel
             {
                 ShoppingCartsList = _unitOfWork.ShoppingCarts.GetAll(u => u.ApplicationUserId == userId,
-                includeProperties: "Shrimp")
+                includeProperties: "Shrimp"),
+                OrderHeader = new OrderHeader()
             };
 
             foreach (var cart in ShoppingCartViewModel.ShoppingCartsList)
             {
                 cart.Price = GetPriceBasedOnQuantity(cart);
-                ShoppingCartViewModel.OrderTotal += (cart.Price*cart.Count);
+                ShoppingCartViewModel.OrderHeader.OrderTotal += (cart.Price*cart.Count);
 
             }
 
@@ -40,7 +42,43 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
         }
         public IActionResult Summary()
         {
-            return View();
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartViewModel = new ShoppingCartViewModel
+            {
+                ShoppingCartsList = _unitOfWork.ShoppingCarts.GetAll(u => u.ApplicationUserId == userId,
+                includeProperties: "Shrimp"),
+                OrderHeader = new OrderHeader()
+            };
+
+            ShoppingCartViewModel.OrderHeader.ApplicationUser = _unitOfWork.ApplicationUsers.Get(u => u.Id == userId);
+
+            ShoppingCartViewModel.OrderHeader.Name = ShoppingCartViewModel.OrderHeader.ApplicationUser.Name;
+            ShoppingCartViewModel.OrderHeader.PhoneNumber = ShoppingCartViewModel.OrderHeader.ApplicationUser.PhoneNumber;
+            ShoppingCartViewModel.OrderHeader.StreetAddress = ShoppingCartViewModel.OrderHeader.ApplicationUser.StreetAddress;
+            ShoppingCartViewModel.OrderHeader.City = ShoppingCartViewModel.OrderHeader.ApplicationUser.City;
+            ShoppingCartViewModel.OrderHeader.State = ShoppingCartViewModel.OrderHeader.ApplicationUser.State;
+            ShoppingCartViewModel.OrderHeader.PostalCode = ShoppingCartViewModel.OrderHeader.ApplicationUser.PostalCode;
+
+            foreach (var cart in ShoppingCartViewModel.ShoppingCartsList)
+            {
+                cart.Price = GetPriceBasedOnQuantity(cart);
+                ShoppingCartViewModel.OrderHeader.OrderTotal += (cart.Price * cart.Count);
+            }
+
+            return View(ShoppingCartViewModel);
+        }
+        [HttpPost]
+        [ActionName("Summary")]
+        public IActionResult SummaryPOST()
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+            ShoppingCartViewModel.ShoppingCartsList = _unitOfWork.ShoppingCarts.GetAll(x => x.ApplicationUserId == userId,
+                includeProperties: "Shrimp");
+            
         }
         public IActionResult Plus(int cartId)
         {

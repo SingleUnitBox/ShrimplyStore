@@ -9,7 +9,6 @@ namespace Shrimply.Models.ViewModels
     public class ShoppingCartViewModel
     {
         public IEnumerable<ShoppingCart> ShoppingCartsList { get; set; }
-        public double OrderTotal { get; set; }
-        
+        public OrderHeader OrderHeader { get; set; }     
     }
 }
