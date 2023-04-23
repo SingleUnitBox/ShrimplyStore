@@ -4,6 +4,8 @@ using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
 using Shrimply.Models.ViewModels;
 using Shrimply.Utility;
+using Stripe.Checkout;
+using Stripe;
 using System.Security.Claims;
 
 namespace ShrimplyStoreWeb.Areas.Customer.Controllers
@@ -35,7 +37,7 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
             foreach (var cart in ShoppingCartViewModel.ShoppingCartsList)
             {
                 cart.Price = GetPriceBasedOnQuantity(cart);
-                ShoppingCartViewModel.OrderHeader.OrderTotal += (cart.Price*cart.Count);
+                ShoppingCartViewModel.OrderHeader.OrderTotal += (cart.Price * cart.Count);
 
             }
 
@@ -119,11 +121,64 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
             if (appUser.CompanyId.GetValueOrDefault() == 0)
             {
                 //stripe logic
+                var domain = "https://localhost:44379/";
+                var options = new SessionCreateOptions
+                {
+                    SuccessUrl = domain+ $"customer/shoppingcart/OrderConfirmation?id={ShoppingCartViewModel.OrderHeader.Id}",
+                    CancelUrl = domain+ "customer/shoppingcart/Index",
+                    LineItems = new List<SessionLineItemOptions>(),
+                    Mode = "payment",
+                };
+
+                foreach (var shrimp in ShoppingCartViewModel.ShoppingCartsList)
+                {
+                    var sessionLineItem = new SessionLineItemOptions
+                    {
+                        PriceData = new SessionLineItemPriceDataOptions
+                        {
+                            UnitAmount = (long)(shrimp.Price * 100),
+                            Currency = "gbp",
+                            ProductData = new SessionLineItemPriceDataProductDataOptions
+                            {
+                                Name = shrimp.Shrimp.Name
+                            }
+                        },
+                        Quantity = shrimp.Count
+                    };
+                    options.LineItems.Add(sessionLineItem);
+                }
+
+                var service = new SessionService();
+                Session session = service.Create(options);
+                _unitOfWork.OrderHeaders.UpdateStripePaymentId(ShoppingCartViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
+                _unitOfWork.Save();
+                Response.Headers.Add("Location", session.Url);
+                return new StatusCodeResult(303);
+
             }
             return RedirectToAction(nameof(OrderConfirmation), new { id = ShoppingCartViewModel.OrderHeader.Id });
         }
         public IActionResult OrderConfirmation(int id)
         {
+            OrderHeader orderHeader = _unitOfWork.OrderHeaders.Get(x => x.Id == id, includeProperties: "ApplicationUser");
+            if (orderHeader.PaymentStatus != SD.PaymentStatusDelayedPayment)
+            {
+                var service = new SessionService();
+                Session session = service.Get(orderHeader.SessionId);
+
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+                    _unitOfWork.OrderHeaders.UpdateStripePaymentId(id, session.Id, session.PaymentIntentId);
+                    _unitOfWork.OrderHeaders.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
+                    _unitOfWork.Save();
+                }
+            }
+
+            List<ShoppingCart> shoppingCartsList = _unitOfWork.ShoppingCarts
+                .GetAll(x => x.ApplicationUserId == orderHeader.ApplicationUserId).ToList();
+            _unitOfWork.ShoppingCarts.RemoveRange(shoppingCartsList);
+            _unitOfWork.Save();
+
             return View(id);
         }
         public IActionResult Plus(int cartId)
@@ -145,7 +200,7 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
             {
                 cartFromDb.Count -= 1;
                 _unitOfWork.ShoppingCarts.Update(cartFromDb);
-            }            
+            }
             _unitOfWork.Save();
             return RedirectToAction(nameof(Index));
         }
