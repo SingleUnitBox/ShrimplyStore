@@ -1,17 +1,22 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
 using Shrimply.Models.ViewModels;
 using Shrimply.Utility;
 using System.Diagnostics;
+using System.Security.Claims;
 
 namespace ShrimplyStoreWeb.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize]
     public class OrderController : Controller
     {
         private readonly IUnitOfWork _unitOfWork;
+        [BindProperty]
+        public OrderViewModel OrderViewModel { get; set; }
 
         public OrderController(IUnitOfWork unitOfWork)
         {
@@ -22,21 +27,69 @@ namespace ShrimplyStoreWeb.Areas.Admin.Controllers
             return View();
         }
 
-        public IActionResult Details(int orderId) 
+        public IActionResult Details(int orderId)
         {
-            OrderViewModel orderViewModel = new()
+            OrderViewModel = new()
             {
                 OrderHeader = _unitOfWork.OrderHeaders.Get(x => x.Id == orderId, includeProperties: "ApplicationUser"),
                 OrderDetails = _unitOfWork.OrderDetails.GetAll(x => x.OrderHeaderId == orderId, includeProperties: "Shrimp"),
             };
-            return View(orderViewModel);
+            return View(OrderViewModel);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+        public IActionResult UpdateOrderDetail()
+        {
+            var orderHeaderFromDb = _unitOfWork.OrderHeaders.Get(x => x.Id == OrderViewModel.OrderHeader.Id);
+            orderHeaderFromDb.Name = OrderViewModel.OrderHeader.Name;
+            orderHeaderFromDb.PhoneNumber = OrderViewModel.OrderHeader.PhoneNumber;
+            orderHeaderFromDb.StreetAddress = OrderViewModel.OrderHeader.StreetAddress;
+            orderHeaderFromDb.City = OrderViewModel.OrderHeader.City;
+            orderHeaderFromDb.State = OrderViewModel.OrderHeader.State;
+            orderHeaderFromDb.PostalCode = OrderViewModel.OrderHeader.PostalCode;
+            if (!string.IsNullOrEmpty(OrderViewModel.OrderHeader.Carrier))
+            {
+                orderHeaderFromDb.Carrier = OrderViewModel.OrderHeader.Carrier;
+            }
+            if (!string.IsNullOrEmpty(OrderViewModel.OrderHeader.TrackingNumber))
+            {
+                orderHeaderFromDb.TrackingNumber = OrderViewModel.OrderHeader.TrackingNumber;
+            }
+            _unitOfWork.OrderHeaders.Update(orderHeaderFromDb);
+            _unitOfWork.Save();
+            TempData["success"] = "Order Details updated successfully";
+
+            return RedirectToAction(nameof(Details), new { orderId = orderHeaderFromDb.Id });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+        public IActionResult StartProcessing()
+        {
+            _unitOfWork.OrderHeaders.UpdateStatus(OrderViewModel.OrderHeader.Id, SD.StatusInProcess);
+            _unitOfWork.Save();
+            TempData["success"] = $"Order status is {SD.StatusInProcess}";
+            return RedirectToAction(nameof(Details), new { orderId = OrderViewModel.OrderHeader.Id });
         }
 
         #region API CALLS
         [HttpGet]
         public IActionResult GetAll(string status)
         {
-            IEnumerable<OrderHeader> orderHeaderList = _unitOfWork.OrderHeaders.GetAll(includeProperties: "ApplicationUser").ToList();
+            IEnumerable<OrderHeader> orderHeaderList;
+            if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
+            {
+                orderHeaderList = _unitOfWork.OrderHeaders.GetAll(includeProperties: "ApplicationUser").ToList();
+            }
+            else
+            {
+                var claimsIdentity = (ClaimsIdentity)User.Identity;
+                var userId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+
+                orderHeaderList = _unitOfWork.OrderHeaders
+                    .GetAll(x => x.ApplicationUserId == userId, includeProperties: "ApplicationUser");
+            }
 
             switch (status)
             {
