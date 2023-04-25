@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
+using Shrimply.Utility;
 using System.Diagnostics;
 using System.Security.Claims;
 
@@ -48,12 +49,15 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
             {
                 cartFromDb.Count += shoppingCart.Count;
                 _unitOfWork.ShoppingCarts.Update(cartFromDb);
+                _unitOfWork.Save();
             }
             else
             {
                 _unitOfWork.ShoppingCarts.Add(shoppingCart);
-            }            
-            _unitOfWork.Save();
+                _unitOfWork.Save();
+                HttpContext.Session.SetInt32(SD.SessionCart, 
+                    _unitOfWork.ShoppingCarts.GetAll(u => u.ApplicationUserId == userId).Count());
+            }
             TempData["success"] = "Cart updated successfully.";
 
             return RedirectToAction(nameof(Index));

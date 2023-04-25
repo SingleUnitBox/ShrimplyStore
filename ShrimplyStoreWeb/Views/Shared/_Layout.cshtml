@@ -1,5 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Identity;
+@using Microsoft.AspNetCore.Http;
 @inject SignInManager<IdentityUser> _signInManager
+@inject IHttpContextAccessor _httpContextAccessor
 
 <!DOCTYPE html>
 <html lang="en">
@@ -56,11 +58,13 @@
                                 </ul>
                             </li>
                         }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="Customer" asp-controller="ShoppingCart" asp-action="Index">
-                                <i class="bi bi-cart"></i> &nbsp; (0)
+                                @await Component.InvokeAsync("ShoppingCart")
                             </a>
                         </li>
+
                     </ul>
                     <partial name="_LoginPartial" />
                 </div>

@@ -41,6 +41,9 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
 
             }
 
+            HttpContext.Session.SetInt32(SD.SessionCart,
+                    _unitOfWork.ShoppingCarts.GetAll(u => u.ApplicationUserId == userId).Count());
+
             return View(ShoppingCartViewModel);
         }
         public IActionResult Summary()
@@ -202,14 +205,18 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
                 _unitOfWork.ShoppingCarts.Update(cartFromDb);
             }
             _unitOfWork.Save();
+            HttpContext.Session.SetInt32(SD.SessionCart,
+                    _unitOfWork.ShoppingCarts.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count());
             return RedirectToAction(nameof(Index));
         }
 
         public IActionResult Remove(int cartId)
         {
             var cartFromDb = _unitOfWork.ShoppingCarts.Get(x => x.Id == cartId, tracked: true);
-            _unitOfWork.ShoppingCarts.Remove(cartFromDb);
+            _unitOfWork.ShoppingCarts.Remove(cartFromDb);           
             _unitOfWork.Save();
+            HttpContext.Session.SetInt32(SD.SessionCart,
+                    _unitOfWork.ShoppingCarts.GetAll(u => u.ApplicationUserId == cartFromDb.ApplicationUserId).Count());
             return RedirectToAction(nameof(Index));
         }
         private double GetPriceBasedOnQuantity(ShoppingCart shoppingCart)
