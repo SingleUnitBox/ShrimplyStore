@@ -5,6 +5,8 @@ using Shrimply.DataAccess.Repository.IRepository;
 using Shrimply.Models;
 using Shrimply.Models.ViewModels;
 using Shrimply.Utility;
+using Stripe;
+using Stripe.Checkout;
 using System.Diagnostics;
 using System.Security.Claims;
 
@@ -71,6 +73,118 @@ namespace ShrimplyStoreWeb.Areas.Admin.Controllers
             _unitOfWork.Save();
             TempData["success"] = $"Order status is {SD.StatusInProcess}";
             return RedirectToAction(nameof(Details), new { orderId = OrderViewModel.OrderHeader.Id });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+        public IActionResult ShipOrder()
+        {
+            var orderHeaderFromDb = _unitOfWork.OrderHeaders.Get(x => x.Id == OrderViewModel.OrderHeader.Id);
+            orderHeaderFromDb.Carrier = OrderViewModel.OrderHeader.Carrier;
+            orderHeaderFromDb.TrackingNumber = OrderViewModel.OrderHeader.TrackingNumber;
+            orderHeaderFromDb.ShippingDate = DateTime.Now;
+            orderHeaderFromDb.OrderStatus = SD.StatusShipped;
+            if (orderHeaderFromDb.PaymentStatus == SD.PaymentStatusDelayedPayment)
+            {
+                orderHeaderFromDb.PaymentDueDate = DateTime.Now.AddDays(30);
+            }
+            _unitOfWork.OrderHeaders.Update(orderHeaderFromDb);
+            _unitOfWork.Save();
+            TempData["success"] = $"Order status is {SD.StatusShipped}";
+            return RedirectToAction(nameof(Details), new { orderId = OrderViewModel.OrderHeader.Id });
+        }
+
+        [HttpPost]
+        [Authorize(Roles = SD.Role_Admin + "," + SD.Role_Employee)]
+        public IActionResult CancelOrder()
+        {
+            var orderHeaderFromDb = _unitOfWork.OrderHeaders.Get(x => x.Id == OrderViewModel.OrderHeader.Id);
+            if (orderHeaderFromDb.OrderStatus == SD.PaymentStatusApproved)
+            {
+                var options = new RefundCreateOptions
+                {
+                    Reason = RefundReasons.RequestedByCustomer,
+                    PaymentIntent = orderHeaderFromDb.PaymentIntentId,
+                };
+                var service = new RefundService();
+                Refund refund = service.Create(options);
+
+                _unitOfWork.OrderHeaders.UpdateStatus(OrderViewModel.OrderHeader.Id, orderStatus: SD.StatusCancelled, paymentStatus: SD.StatusRefunded);
+            }
+            else
+            {
+                _unitOfWork.OrderHeaders.UpdateStatus(OrderViewModel.OrderHeader.Id, SD.StatusCancelled, SD.StatusCancelled);
+            }
+            _unitOfWork.Save();
+            TempData["success"] = $"Order status is {SD.StatusCancelled}";
+            return RedirectToAction(nameof(Details), new { orderId = OrderViewModel.OrderHeader.Id });
+
+        }
+
+        [ActionName("Details")]
+        [HttpPost]
+
+        public IActionResult Details_PayNow()
+        {
+            OrderViewModel.OrderHeader = _unitOfWork.OrderHeaders
+                .Get(x => x.Id == OrderViewModel.OrderHeader.Id, includeProperties: "ApplicationUser");
+            OrderViewModel.OrderDetails = _unitOfWork.OrderDetails
+                .GetAll(x => x.OrderHeaderId == OrderViewModel.OrderHeader.Id, includeProperties: "Shrimp");
+
+            var domain = "https://localhost:44379/";
+            var options = new SessionCreateOptions
+            {
+                SuccessUrl = domain + $"admin/order/PaymentConfirmation?orderHeaderId={OrderViewModel.OrderHeader.Id}",
+                CancelUrl = domain + $"admin/order/details?orderHeaderId={OrderViewModel.OrderHeader.Id}",
+                LineItems = new List<SessionLineItemOptions>(),
+                Mode = "payment",
+            };
+
+            foreach (var shrimp in OrderViewModel.OrderDetails)
+            {
+                var sessionLineItem = new SessionLineItemOptions
+                {
+                    PriceData = new SessionLineItemPriceDataOptions
+                    {
+                        UnitAmount = (long)(shrimp.Price * 100),
+                        Currency = "gbp",
+                        ProductData = new SessionLineItemPriceDataProductDataOptions
+                        {
+                            Name = shrimp.Shrimp.Name
+                        }
+                    },
+                    Quantity = shrimp.Count
+                };
+                options.LineItems.Add(sessionLineItem);
+            }
+
+            var service = new SessionService();
+            Session session = service.Create(options);
+            _unitOfWork.OrderHeaders.UpdateStripePaymentId(OrderViewModel.OrderHeader.Id, session.Id, session.PaymentIntentId);
+            _unitOfWork.Save();
+            Response.Headers.Add("Location", session.Url);
+            return new StatusCodeResult(303);
+
+        }
+
+        public IActionResult PaymentConfirmation(int orderHeaderId)
+        {
+            OrderHeader orderHeader = _unitOfWork.OrderHeaders
+                .Get(x => x.Id == orderHeaderId, includeProperties: "ApplicationUser");
+            if (orderHeader.PaymentStatus == SD.PaymentStatusDelayedPayment)
+            {
+                var service = new SessionService();
+                Session session = service.Get(orderHeader.SessionId);
+
+                if (session.PaymentStatus.ToLower() == "paid")
+                {
+                    _unitOfWork.OrderHeaders.UpdateStripePaymentId(orderHeader.Id, session.Id, session.PaymentIntentId);
+                    _unitOfWork.OrderHeaders.UpdateStatus(orderHeader.Id, orderHeader.OrderStatus, SD.PaymentStatusApproved);
+                    _unitOfWork.Save();
+                }
+            }
+
+            return View(orderHeaderId);
         }
 
         #region API CALLS
