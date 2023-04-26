@@ -4,9 +4,18 @@
 <div class="card shadow border-0 mt-4">
     <div class="card-header">
         <div class="row">
-            <div class="col-12 text-center">
-                <h2> Register </h2>
-            </div>
+            @if (User.IsInRole(SD.Role_Admin))
+            {
+                <div class="col-12 text-center">
+                    <h2> Register - Admin Portal</h2>
+                </div>
+            }
+            else
+            {
+                <div class="col-12 text-center">
+                    <h2> Register </h2>
+                </div>
+            }
         </div>
     </div>
     <div class="card-body p-4">
@@ -61,51 +70,57 @@
                         <label asp-for="Input.PhoneNumber" class="ms-2 text-muted">Phone Number</label>
                         <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
                     </div>
-                    <div class="form-floating py-2 col-md-6">
-                        <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-select border-0 shadow">
-                            <option disabled selected>-- Select Role --</option>
-                        </select>
-                    </div>
-                    <div class="form-floating py-2 col-md-6">
-                        <select asp-for="Input.CompanyId" style="display:none;" asp-items="@Model.Input.CompaniesList" class="form-select border-0 shadow">
-                            <option disabled selected>-- Select Company --</option>
-                        </select>
-                    </div>
+                    @if (User.IsInRole(SD.Role_Admin) || User.IsInRole(SD.Role_Employee))
+                    {
+                        <div class="form-floating py-2 col-md-6">
+                            <select asp-for="Input.Role" asp-items="@Model.Input.RoleList" class="form-select border-0 shadow">
+                                <option disabled selected>-- Select Role --</option>
+                            </select>
+                        </div>
+                        <div class="form-floating py-2 col-md-6">
+                            <select asp-for="Input.CompanyId" style="display:none;" asp-items="@Model.Input.CompaniesList" class="form-select border-0 shadow">
+                                <option disabled selected>-- Select Company --</option>
+                            </select>
+                        </div>
+                    }
                     <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
                 </form>
             </div>
-            <div class="col-md-12">
-                <section>
-                    <h3>Use another service to register.</h3>
-                    <hr />
-                    @{
-                        if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                        {
-                            <div>
-                                <p>
-                                    There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
-                                        article
-                                        about setting up this ASP.NET application to support logging in via external services
-                                    </a>.
-                                </p>
-                            </div>
-                        }
-                        else
-                        {
-                            <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+            @if (!User.IsInRole(SD.Role_Admin))
+            {
+                <div class="col-md-12">
+                    <section>
+                        <h3>Use another service to register.</h3>
+                        <hr />
+                        @{
+                            if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                            {
                                 <div>
                                     <p>
-                                        @foreach (var provider in Model.ExternalLogins!)
-                                        {
-                                            <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                        }
+                                        There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">
+                                            article
+                                            about setting up this ASP.NET application to support logging in via external services
+                                        </a>.
                                     </p>
                                 </div>
-                            </form>
+                            }
+                            else
+                            {
+                                <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                                    <div>
+                                        <p>
+                                            @foreach (var provider in Model.ExternalLogins!)
+                                            {
+                                                <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                            }
+                                        </p>
+                                    </div>
+                                </form>
+                            }
                         }
-                    }
-                </section>
+                    </section>
             </div>
+            }
         </div>
     </div>
 </div>
@@ -116,12 +131,12 @@
     <partial name="_ValidationScriptsPartial" />
     <script>
         $(document).ready(function () {
-            $('#Input_Role').change(function (){
+            $('#Input_Role').change(function () {
                 var selection = $('#Input_Role Option:Selected').text();
-                if (selection == 'Company'){
+                if (selection == 'Company') {
                     $('#Input_CompanyId').show();
                 }
-                else{
+                else {
                     $('#Input_CompanyId').hide();
                 }
             })

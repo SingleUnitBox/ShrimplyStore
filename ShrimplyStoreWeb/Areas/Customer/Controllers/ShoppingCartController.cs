@@ -175,6 +175,7 @@ namespace ShrimplyStoreWeb.Areas.Customer.Controllers
                     _unitOfWork.OrderHeaders.UpdateStatus(id, SD.StatusApproved, SD.PaymentStatusApproved);
                     _unitOfWork.Save();
                 }
+                HttpContext.Session.Clear();
             }
 
             List<ShoppingCart> shoppingCartsList = _unitOfWork.ShoppingCarts
