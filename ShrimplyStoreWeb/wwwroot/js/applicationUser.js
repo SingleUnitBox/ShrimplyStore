@@ -26,7 +26,7 @@ function loadDataTable() {
                                     <a onclick=LockUnlock('${data.id}') class="btn btn-success" style="cursor:pointer">
                                     <i class="bi bi-unlock-fill"></i>Unlock
                                     </a>
-                                    <a href="/admin/ApplicationUser/RoleManagement?userid=${data.id}" class="btn btn-danger" style="cursor:pointer">
+                                    <a href="/admin/ApplicationUser/RoleManagement?userId=${data.id}" class="btn btn-danger" style="cursor:pointer">
                                     <i class="bi bi-pencil-square"></i>Permission
                                     </a>
                                     </div>`

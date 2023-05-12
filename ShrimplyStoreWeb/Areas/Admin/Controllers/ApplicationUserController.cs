@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Shrimply.DataAccess.Data;
@@ -15,46 +16,67 @@ namespace ShrimplyStoreWeb.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ShrimplyStoreDbContext _shrimplyStoreDbContext;
+        private readonly UserManager<IdentityUser> _userManager;
 
         public ApplicationUserController(IUnitOfWork unitOfWork,
-            ShrimplyStoreDbContext shrimplyStoreDbContext)
+            ShrimplyStoreDbContext shrimplyStoreDbContext,
+            UserManager<IdentityUser> userManager)
         {
             _unitOfWork = unitOfWork;
             _shrimplyStoreDbContext = shrimplyStoreDbContext;
+            _userManager = userManager;
         }
         public IActionResult Index()
         {
             return View();
         }
-        public IActionResult RoleManagement(string? userId)
+        public IActionResult RoleManagement(string userId)
         {
             RoleManagementViewModel roleManagementViewModel = new()
             {
                 ApplicationUser = _unitOfWork.ApplicationUsers.Get(x => x.Id == userId, includeProperties: "Company"),
-                
-                CompanyList = _unitOfWork.Companies.GetAll().Select(x =>
-                    new SelectListItem
+                RoleList = _shrimplyStoreDbContext.Roles.ToList()
+                    .Select(x => new SelectListItem 
+                    { 
+                        Text = x.Name,
+                        Value = x.Name
+                    }),
+                CompanyList = _unitOfWork.Companies.GetAll().Select(x => new SelectListItem
                     {
                         Text = x.Name,
-                        Value = x.Id.ToString(),
-                    }),
-                RoleList = _shrimplyStoreDbContext.Roles.ToList().Select(x =>
-                   new SelectListItem
-                   {
-                       Text = x.Name,
-                       Value = x.Name,
-
-                   }
-                )
+                        Value = x.Id.ToString()
+                    })
             };
-            var userRoles = _shrimplyStoreDbContext.UserRoles.ToList(); //UserId, RoleID
-            var roles = _shrimplyStoreDbContext.Roles.ToList(); //Id, Name - admin, employee, customer, company
-
-            var roleId = userRoles.FirstOrDefault(x => x.UserId == userId).RoleId; 
-            roleManagementViewModel.ApplicationUser.Role = roles.FirstOrDefault(x => x.Id == roleId).Name;
-
+            var roles = _shrimplyStoreDbContext.Roles.ToList();
+            var userRoles = _shrimplyStoreDbContext.UserRoles.ToList();
+            var userRoleId = userRoles.FirstOrDefault(x => x.UserId == userId).RoleId;
+            roleManagementViewModel.ApplicationUser.Role = roles.FirstOrDefault(x => x.Id == userRoleId).Name;
             return View(roleManagementViewModel);
         }
+        [HttpPost]
+        public IActionResult RoleManagement(RoleManagementViewModel roleManagementViewModel)
+        {
+            var userFromDb = _unitOfWork.ApplicationUsers.Get(x => x.Id == roleManagementViewModel.ApplicationUser.Id,
+                includeProperties: "Company");
+            if (roleManagementViewModel.ApplicationUser.CompanyId != null)
+            {
+                userFromDb.CompanyId = roleManagementViewModel.ApplicationUser.CompanyId;
+            }
+            var roles = _shrimplyStoreDbContext.Roles.ToList();
+            var userRoles = _shrimplyStoreDbContext.UserRoles.ToList();
+            var userFromDbRoleId = userRoles.FirstOrDefault(x => x.UserId == userFromDb.Id).RoleId;
+            userFromDb.Role = roles.FirstOrDefault(x => x.Id == userFromDbRoleId).Name;
+            if (roleManagementViewModel.ApplicationUser.Role != userFromDb.Role)
+            {
+                _userManager.RemoveFromRoleAsync(roleManagementViewModel.ApplicationUser, userFromDb.Role).GetAwaiter().GetResult();
+                _userManager.AddToRoleAsync(roleManagementViewModel.ApplicationUser, roleManagementViewModel.ApplicationUser.Role).GetAwaiter().GetType();
+            }
+            _shrimplyStoreDbContext.SaveChanges();
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
 
         #region APICALLS
         [HttpGet]
